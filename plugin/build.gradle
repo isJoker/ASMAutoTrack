@@ -1,0 +1,38 @@
+apply plugin: 'groovy'
+apply plugin: 'maven'
+dependencies {
+    implementation gradleApi()
+    implementation localGroovy()
+
+    implementation 'org.ow2.asm:asm:6.0'
+    implementation 'org.ow2.asm:asm-commons:6.0'
+    implementation 'org.ow2.asm:asm-analysis:6.0'
+    implementation 'org.ow2.asm:asm-util:6.0'
+    implementation 'org.ow2.asm:asm-tree:6.0'
+    compileOnly 'com.android.tools.build:gradle:3.4.1', {
+        exclude group:'org.ow2.asm'
+    }
+}
+repositories {
+    jcenter()
+}
+
+uploadArchives {
+    repositories.mavenDeployer {
+        //本地仓库路径，以放到项目根目录下的 repo 的文件夹为例
+        repository(url: uri('../repo'))
+
+        //groupId ，自行定义
+        pom.groupId = 'com.jokerwan'
+
+        //artifactId
+        pom.artifactId = 'autotrack.android'
+
+        //插件版本号
+        pom.version = '1.0.0'
+    }
+}
+
+
+
+
