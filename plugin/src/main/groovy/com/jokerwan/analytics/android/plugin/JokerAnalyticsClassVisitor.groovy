@@ -15,20 +15,39 @@ class JokerAnalyticsClassVisitor extends ClassVisitor implements Opcodes {
         this.classVisitor = classVisitor
     }
 
-    private
-    static void visitMethodWithLoadedParams(MethodVisitor methodVisitor, int opcode, String owner, String methodName, String methodDesc, int start, int count, List<Integer> paramOpcodes) {
+    private static void visitMethodWithLoadedParams(MethodVisitor methodVisitor, int opcode, String owner, String methodName, String methodDesc, int start, int count, List<Integer> paramOpcodes) {
         for (int i = start; i < start + count; i++) {
             methodVisitor.visitVarInsn(paramOpcodes[i - start], i)
         }
         methodVisitor.visitMethodInsn(opcode, owner, methodName, methodDesc, false)
     }
 
+    /**
+     * 可以拿到类的详细信息
+     *
+     * @param version jdk的版本： 52 代表jdk版本 1.8；51 代表jdk版本 1.7
+     * @param access 类的修饰符：ACC_PUBLIC、ACC_PRIVATE、ACC_PROTECTED、ACC_FINAL、ACC_SUPER
+     * @param name 类的名称：以路径的形式表示 com/joker/demo/TestClass
+     * @param signature 泛型信息：未定义泛型，则该参数为null
+     * @param superName 表示当前类所继承的父类
+     * @param interfaces 表示类所实现的接口列表
+     */
     @Override
     void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
         super.visit(version, access, name, signature, superName, interfaces)
         mInterfaces = interfaces
     }
 
+    /**
+     * 当扫描器扫描到类的方法时调用
+     *
+     * @param access 方法的修饰符
+     * @param name 方法名
+     * @param desc 方法签名
+     * @param signature 泛型描述
+     * @param exceptions 表示将会抛出的异常，如果方法没有抛出异常，则参数为空
+     * @return
+     */
     @Override
     MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
         MethodVisitor methodVisitor = super.visitMethod(access, name, desc, signature, exceptions)

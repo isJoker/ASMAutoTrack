@@ -3,7 +3,6 @@ package com.jokerwan.analytics.android.plugin
 import com.android.build.api.transform.*
 import com.android.build.gradle.internal.pipeline.TransformManager
 import groovy.io.FileType
-import org.apache.commons.codec.digest.DigestUtils
 import org.apache.commons.io.FileUtils
 import org.gradle.api.Project
 
@@ -62,14 +61,14 @@ class JokerAnalyticsTransform extends Transform {
             outputProvider.deleteAll()
         }
 
-        /**Transform 的 inputs 有两种类型，一种是目录，一种是 jar 包，要分开遍历 */
+        // Transform 的 inputs 有两种类型，一种是目录，一种是 jar 包，要分开遍历
         inputs.each { TransformInput input ->
-            /**遍历目录*/
+            // 遍历目录
             input.directoryInputs.each { DirectoryInput directoryInput ->
                 _processDirectoryInput(outputProvider, directoryInput, context)
             }
 
-            /**遍历 jar*/
+            // 遍历 jar
             input.jarInputs.each { JarInput jarInput ->
                 _processJarInput(jarInput, outputProvider, context)
             }
@@ -79,16 +78,17 @@ class JokerAnalyticsTransform extends Transform {
     void _processJarInput(JarInput jarInput, TransformOutputProvider outputProvider, Context context) {
         String destName = jarInput.file.name
 
-        /**截取文件路径的 md5 值重命名输出文件,因为可能同名,会覆盖*/
+        // 截取文件路径的 md5 值重命名输出文件,因为可能同名,会覆盖
         def hexName = DigestUtils.md5Hex(jarInput.file.absolutePath).substring(0, 8)
-        /** 获取 jar 名字*/
+        // 获取 jar 名字
         if (destName.endsWith(".jar")) {
             destName = destName.substring(0, destName.length() - 4)
         }
 
-        /** 获得输出文件*/
+        // 获得输出文件
         File dest = outputProvider.getContentLocation(destName + "_" + hexName, jarInput.contentTypes, jarInput.scopes, Format.JAR)
         def modifiedJar = null
+        // 修改字节码文件
         if (!jokerAnalyticsExtension.disableAppClick) {
             modifiedJar = JokerAnalyticsClassModifier.modifyJar(jarInput.file, context.getTemporaryDir(), true)
         }
@@ -99,22 +99,23 @@ class JokerAnalyticsTransform extends Transform {
     }
 
     void _processDirectoryInput(TransformOutputProvider outputProvider, DirectoryInput directoryInput,Context context) {
-        /**当前这个 Transform 输出目录*/
+        // 当前这个 Transform 输出目录
         File dest = outputProvider.getContentLocation(directoryInput.name, directoryInput.contentTypes, directoryInput.scopes, Format.DIRECTORY)
         File dir = directoryInput.file
 
         if (dir) {
             HashMap<String, File> modifyMap = new HashMap<>()
-            /**遍历以某一扩展名结尾的文件*/
+            // 遍历以某一扩展名结尾的文件
             dir.traverse(type: FileType.FILES, nameFilter: ~/.*\.class/) {
                 File classFile ->
                     if (JokerAnalyticsClassModifier.isShouldModify(classFile.name)) {
                         File modified = null
+                        // 修改字节码文件
                         if (!jokerAnalyticsExtension.disableAppClick) {
                             modified = JokerAnalyticsClassModifier.modifyClassFile(dir, classFile, context.getTemporaryDir())
                         }
                         if (modified != null) {
-                            /**key 为包名 + 类名，如：/cn/sensorsdata/autotrack/android/app/MainActivity.class*/
+                            // key 为包名 + 类名，如：/com/jokerwan/testasm/MainActivity.class
                             String ke = classFile.absolutePath.replace(dir.absolutePath, "")
                             modifyMap.put(ke, modified)
                         }
