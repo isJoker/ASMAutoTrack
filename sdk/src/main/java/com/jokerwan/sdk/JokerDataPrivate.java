@@ -280,29 +280,10 @@ class JokerDataPrivate {
      * @return Activity
      */
     public static Activity getActivityFromView(View view) {
-        Activity activity = null;
         if (view == null) {
             return null;
         }
-
-        try {
-            Context context = view.getContext();
-            if (context != null) {
-                if (context instanceof Activity) {
-                    activity = (Activity) context;
-                } else if (context instanceof ContextWrapper) {
-                    while (!(context instanceof Activity) && context instanceof ContextWrapper) {
-                        context = ((ContextWrapper) context).getBaseContext();
-                    }
-                    if (context instanceof Activity) {
-                        activity = (Activity) context;
-                    }
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return activity;
+        return getActivityFromContext(view.getContext());
     }
 
     public static Activity getActivityFromContext(Context context) {
