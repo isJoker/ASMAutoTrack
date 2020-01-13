@@ -20,7 +20,6 @@ public class JokerDataAPI {
     private static final Object mLock = new Object();
     private static Map<String, Object> mDeviceInfo;
     private String mDeviceId;
-
     @Keep
     @SuppressWarnings("UnusedReturnValue")
     public static JokerDataAPI init(Application application) {

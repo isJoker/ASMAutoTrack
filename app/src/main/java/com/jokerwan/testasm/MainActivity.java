@@ -11,6 +11,7 @@ import androidx.databinding.DataBindingUtil;
 
 import com.jokerwan.sdk.JokerDataTrackViewOnClick;
 import com.jokerwan.testasm.databinding.ActivityMainBinding;
+import com.jokerwan.testasm.model.UserModel;
 
 public class MainActivity extends AppCompatActivity implements MainListener{
 
@@ -22,15 +23,25 @@ public class MainActivity extends AppCompatActivity implements MainListener{
         binding.btnSetClick.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                showToast("携带业务参数");
+            }
+        });
+        // 通过在 xml 里面 通过 bindingTag 方式设置需要收集的业务 model
+        binding.btnModel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
                 showToast("普通按钮点击");
             }
         });
+        binding.setModel(new UserModel("张三","18","男"));
 
         binding.setListener(this);
 
         binding.btnLambdaSetClick.setOnClickListener(v -> showToast("lambdaSetOnClickListener"));
 
         binding.btnDialogClick.setOnClickListener(v -> showDialog(MainActivity.this));
+
+        binding.llContainer.setOnClickListener(v -> showToast("线性布局容器点击"));
     }
 
 

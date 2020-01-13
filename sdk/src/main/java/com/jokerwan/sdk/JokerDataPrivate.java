@@ -15,15 +15,19 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CheckedTextView;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RatingBar;
+import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
 import androidx.appcompat.widget.SwitchCompat;
+import androidx.constraintlayout.widget.ConstraintLayout;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -59,7 +63,6 @@ class JokerDataPrivate {
     public static Map<String, Object> getDeviceInfo(Context context) {
         final Map<String, Object> deviceInfo = new HashMap<>();
         {
-            deviceInfo.put("$lib", "Android");
             deviceInfo.put("$lib_version", JokerDataAPI.SDK_VERSION);
             deviceInfo.put("$os", "Android");
             deviceInfo.put("$os_version",
@@ -154,6 +157,14 @@ class JokerDataPrivate {
             viewType = "RatingBar";
         } else if (view instanceof SeekBar) {
             viewType = "SeekBar";
+        } else if(view instanceof LinearLayout){
+            viewType = "LinearLayout";
+        } else if(view instanceof RelativeLayout){
+            viewType = "RelativeLayout";
+        } else if(view instanceof FrameLayout){
+            viewType = "FrameLayout";
+        } else if(view instanceof ConstraintLayout){
+            viewType = "ConstraintLayout";
         }
         return viewType;
     }
@@ -165,6 +176,12 @@ class JokerDataPrivate {
             }
 
             final int childCount = root.getChildCount();
+            if(childCount <= 0) {
+                if(!TextUtils.isEmpty(root.getContentDescription())) {
+                    stringBuilder.append(root.getContentDescription());
+                }
+                return stringBuilder.toString();
+            }
             for (int i = 0; i < childCount; ++i) {
                 final View child = root.getChildAt(i);
 
@@ -202,10 +219,9 @@ class JokerDataPrivate {
                     } else if (child instanceof TextView) {
                         TextView textView = (TextView) child;
                         viewText = textView.getText();
-                    } else if (child instanceof ImageView) {
-                        ImageView imageView = (ImageView) child;
-                        if (!TextUtils.isEmpty(imageView.getContentDescription())) {
-                            viewText = imageView.getContentDescription().toString();
+                    } else {
+                        if (!TextUtils.isEmpty(child.getContentDescription())) {
+                            viewText = child.getContentDescription().toString();
                         }
                     }
 
@@ -266,6 +282,8 @@ class JokerDataPrivate {
         } else if (view instanceof RatingBar) {
             RatingBar ratingBar = (RatingBar) view;
             viewText = String.valueOf(ratingBar.getRating());
+        } else {
+            viewText = view.getContentDescription();
         }
         if (viewText != null) {
             return viewText.toString();
@@ -372,5 +390,14 @@ class JokerDataPrivate {
             e.printStackTrace();
             return "";
         }
+    }
+
+    public static String getTagData(View view) {
+        String tagData = null;
+        String tag = (String) view.getTag(R.id.key_binding_tag);
+        if(tag != null) {
+            tagData = tag;
+        }
+        return tagData;
     }
 }

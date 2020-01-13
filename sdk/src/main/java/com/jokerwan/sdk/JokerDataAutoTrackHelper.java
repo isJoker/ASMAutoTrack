@@ -395,6 +395,11 @@ public class JokerDataAutoTrackHelper {
             jsonObject.put("$element_id", JokerDataPrivate.getViewId(view));
             jsonObject.put("$element_content", JokerDataPrivate.getElementContent(view));
 
+            String tagData = JokerDataPrivate.getTagData(view);
+            if(!TextUtils.isEmpty(tagData)) {
+                jsonObject.put("$features", tagData);
+            }
+
             Activity activity = JokerDataPrivate.getActivityFromView(view);
             if (activity != null) {
                 jsonObject.put("$activity", activity.getClass().getCanonicalName());

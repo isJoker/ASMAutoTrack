@@ -8,6 +8,10 @@
         <variable
             name="listener"
             type="com.jokerwan.testasm.MainListener" />
+
+        <variable
+            name="model"
+            type="com.jokerwan.testasm.model.UserModel" />
     </data>
 
     <LinearLayout
@@ -16,6 +20,14 @@
         android:gravity="center_horizontal"
         android:orientation="vertical"
         tools:context=".MainActivity">
+
+        <Button
+            android:id="@+id/btn_model"
+            BindingTag="@{model}"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="携带业务参数"
+            android:textAllCaps="false" />
 
         <Button
             android:id="@+id/btn_set_click"
@@ -46,12 +58,31 @@
             android:layout_height="wrap_content"
             android:text="Lambda 语法 setOnClickListener"
             android:textAllCaps="false" />
+
         <Button
             android:id="@+id/btn_dialog_click"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="点击弹出Dialog"
             android:textAllCaps="false" />
+
+        <LinearLayout
+            android:id="@+id/ll_container"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:layout_marginTop="10dp"
+            android:background="#FFC107"
+            android:contentDescription="黄色区域线性布局容器"
+            android:gravity="center">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="线性布局容器点击"
+                android:textColor="@android:color/black"
+                android:textSize="18sp" />
+
+        </LinearLayout>
 
         <fragment
             android:id="@+id/testFragment"
