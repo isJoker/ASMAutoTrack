@@ -39,6 +39,8 @@ class JokerAnalyticsTransform extends Transform {
      * 5. SUB_PROJECTS              只有子项目。
      * 6. SUB_PROJECTS_LOCAL_DEPS   只有子项目的本地依赖项(本地jar)。
      * 7. TESTED_CODE               由当前变量(包括依赖项)测试的代码
+     *
+     *  SCOPE_FULL_PROJECT = ImmutableSet.of(Scope.PROJECT, Scope.SUB_PROJECTS, Scope.EXTERNAL_LIBRARIES);
      * @return
      */
     @Override
@@ -105,7 +107,7 @@ class JokerAnalyticsTransform extends Transform {
 
         if (dir) {
             HashMap<String, File> modifyMap = new HashMap<>()
-            // 遍历以某一扩展名结尾的文件
+            // 遍历以".class"扩展名结尾的文件
             dir.traverse(type: FileType.FILES, nameFilter: ~/.*\.class/) {
                 File classFile ->
                     if (JokerAnalyticsClassModifier.isShouldModify(classFile.name)) {
@@ -115,9 +117,9 @@ class JokerAnalyticsTransform extends Transform {
                             modified = JokerAnalyticsClassModifier.modifyClassFile(dir, classFile, context.getTemporaryDir())
                         }
                         if (modified != null) {
-                            // key 为包名 + 类名，如：/com/jokerwan/testasm/MainActivity.class
-                            String ke = classFile.absolutePath.replace(dir.absolutePath, "")
-                            modifyMap.put(ke, modified)
+                            // key 为 类名，classFile.absolutePath 如：/com/jokerwan/testasm/MainActivity.class
+                            String key = classFile.absolutePath.replace(dir.absolutePath, "")
+                            modifyMap.put(key, modified)
                         }
                     }
             }

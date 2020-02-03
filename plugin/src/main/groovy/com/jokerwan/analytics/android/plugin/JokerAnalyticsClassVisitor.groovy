@@ -2,6 +2,9 @@ package com.jokerwan.analytics.android.plugin
 
 import org.objectweb.asm.*
 
+/**
+ * 用来访问类的信息并插入埋点代码
+ */
 class JokerAnalyticsClassVisitor extends ClassVisitor implements Opcodes {
     private final
     static String SDK_API_CLASS = "com/jokerwan/sdk/JokerDataAutoTrackHelper"
@@ -156,6 +159,13 @@ class JokerAnalyticsClassVisitor extends ClassVisitor implements Opcodes {
                 }
             }
 
+            /**
+             * 当扫描器扫描到类注解声明时进行调用
+             *
+             * @param desc 注解类型(签名类型)
+             * @param visible 注解是否可以在 JVM 中可见
+             * @return
+             */
             @Override
             AnnotationVisitor visitAnnotation(String s, boolean b) {
                 if (s == 'Lcom/jokerwan/sdk/JokerDataTrackViewOnClick;') {
