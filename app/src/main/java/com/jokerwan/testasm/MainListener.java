@@ -6,4 +6,6 @@ package com.jokerwan.testasm;
  */
 public interface MainListener {
     void onMainClick();
+
+    void onIncludeItemClick();
 }

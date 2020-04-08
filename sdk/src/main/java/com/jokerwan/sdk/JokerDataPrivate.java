@@ -1,9 +1,12 @@
 package com.jokerwan.sdk;
 
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
+import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Context;
 import android.content.ContextWrapper;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -29,10 +32,11 @@ import android.widget.ToggleButton;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
-import org.json.JSONException;
+import com.jokerwan.sdk.utils.DateFormatUtils;
+
 import org.json.JSONObject;
 
-import java.text.SimpleDateFormat;
+import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -40,25 +44,7 @@ import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
 
-class JokerDataPrivate {
-    private static final SimpleDateFormat mDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"
-            + ".SSS", Locale.CHINA);
-
-    public static void mergeJSONObject(final JSONObject source, JSONObject dest)
-            throws JSONException {
-        Iterator<String> superPropertiesIterator = source.keys();
-        while (superPropertiesIterator.hasNext()) {
-            String key = superPropertiesIterator.next();
-            Object value = source.get(key);
-            if (value instanceof Date) {
-                synchronized (mDateFormat) {
-                    dest.put(key, mDateFormat.format((Date) value));
-                }
-            } else {
-                dest.put(key, value);
-            }
-        }
-    }
+public class JokerDataPrivate {
 
     public static Map<String, Object> getDeviceInfo(Context context) {
         final Map<String, Object> deviceInfo = new HashMap<>();
@@ -157,13 +143,13 @@ class JokerDataPrivate {
             viewType = "RatingBar";
         } else if (view instanceof SeekBar) {
             viewType = "SeekBar";
-        } else if(view instanceof LinearLayout){
+        } else if (view instanceof LinearLayout) {
             viewType = "LinearLayout";
-        } else if(view instanceof RelativeLayout){
+        } else if (view instanceof RelativeLayout) {
             viewType = "RelativeLayout";
-        } else if(view instanceof FrameLayout){
+        } else if (view instanceof FrameLayout) {
             viewType = "FrameLayout";
-        } else if(view instanceof ConstraintLayout){
+        } else if (view instanceof ConstraintLayout) {
             viewType = "ConstraintLayout";
         }
         return viewType;
@@ -176,8 +162,8 @@ class JokerDataPrivate {
             }
 
             final int childCount = root.getChildCount();
-            if(childCount <= 0) {
-                if(!TextUtils.isEmpty(root.getContentDescription())) {
+            if (childCount <= 0) {
+                if (!TextUtils.isEmpty(root.getContentDescription())) {
                     stringBuilder.append(root.getContentDescription());
                 }
                 return stringBuilder.toString();
@@ -392,10 +378,125 @@ class JokerDataPrivate {
         }
     }
 
+    /**
+     * 获取 Activity 的 title
+     *
+     * @param activity Activity
+     * @return Activity 的 title
+     */
+    public static String getActivityTitle(Activity activity) {
+        try {
+            if (activity != null) {
+                try {
+                    String activityTitle = null;
+
+                    if (Build.VERSION.SDK_INT >= 11) {
+                        String toolbarTitle = getToolbarTitle(activity);
+                        if (!TextUtils.isEmpty(toolbarTitle)) {
+                            activityTitle = toolbarTitle;
+                        }
+                    }
+
+                    if (TextUtils.isEmpty(activityTitle)) {
+                        activityTitle = activity.getTitle().toString();
+                    }
+
+                    if (TextUtils.isEmpty(activityTitle)) {
+                        PackageManager packageManager = activity.getPackageManager();
+                        if (packageManager != null) {
+                            ActivityInfo activityInfo = packageManager.getActivityInfo(activity.getComponentName(), 0);
+                            if (!TextUtils.isEmpty(activityInfo.loadLabel(packageManager))) {
+                                activityTitle = activityInfo.loadLabel(packageManager).toString();
+                            }
+                        }
+                    }
+
+                    return activityTitle;
+                } catch (Exception e) {
+                    return null;
+                }
+            }
+            return null;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    @TargetApi(11)
+    public static String getToolbarTitle(Activity activity) {
+        try {
+            if ("com.tencent.connect.common.AssistActivity".equals(activity.getClass().getCanonicalName())) {
+                if (!TextUtils.isEmpty(activity.getTitle())) {
+                    return activity.getTitle().toString();
+                }
+                return null;
+            }
+            ActionBar actionBar = activity.getActionBar();
+            if (actionBar != null) {
+                if (!TextUtils.isEmpty(actionBar.getTitle())) {
+                    return actionBar.getTitle().toString();
+                }
+            } else {
+                try {
+                    Class<?> appCompatActivityClass = compatActivity();
+                    if (appCompatActivityClass != null && appCompatActivityClass.isInstance(activity)) {
+                        Method method = activity.getClass().getMethod("getSupportActionBar");
+                        Object supportActionBar = method.invoke(activity);
+                        if (supportActionBar != null) {
+                            method = supportActionBar.getClass().getMethod("getTitle");
+                            CharSequence charSequence = (CharSequence) method.invoke(supportActionBar);
+                            if (charSequence != null) {
+                                return charSequence.toString();
+                            }
+                        }
+                    }
+                } catch (Exception e) {
+                    //ignored
+                }
+            }
+        } catch (Exception ignored) {
+        }
+        return null;
+    }
+
+    private static Class<?> compatActivity() {
+        Class<?> appCompatActivityClass = null;
+        try {
+            appCompatActivityClass = Class.forName("android.support.v7.app.AppCompatActivity");
+        } catch (Exception e) {
+            //ignored
+        }
+        if (appCompatActivityClass == null) {
+            try {
+                appCompatActivityClass = Class.forName("androidx.appcompat.app.AppCompatActivity");
+            } catch (Exception e) {
+                //ignored
+            }
+        }
+        return appCompatActivityClass;
+    }
+
+    public static void mergeJSONObject(final JSONObject source, JSONObject dest) {
+        try {
+            Iterator<String> superPropertiesIterator = source.keys();
+
+            while (superPropertiesIterator.hasNext()) {
+                String key = superPropertiesIterator.next();
+                Object value = source.get(key);
+                if (value instanceof Date && !"$time".equals(key)) {
+                    dest.put(key, DateFormatUtils.formatDate((Date) value, Locale.CHINA));
+                } else {
+                    dest.put(key, value);
+                }
+            }
+        } catch (Exception ignored) {
+        }
+    }
+
     public static String getTagData(View view) {
         String tagData = null;
         String tag = (String) view.getTag(R.id.key_binding_tag);
-        if(tag != null) {
+        if (tag != null) {
             tagData = tag;
         }
         return tagData;

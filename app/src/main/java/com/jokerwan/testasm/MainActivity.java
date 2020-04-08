@@ -9,7 +9,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 
-import com.jokerwan.sdk.JokerDataTrackViewOnClick;
+import com.jokerwan.sdk.JokerTrackViewOnClick;
 import com.jokerwan.testasm.databinding.ActivityMainBinding;
 import com.jokerwan.testasm.model.UserModel;
 
@@ -42,6 +42,10 @@ public class MainActivity extends AppCompatActivity implements MainListener{
         binding.btnDialogClick.setOnClickListener(v -> showDialog(MainActivity.this));
 
         binding.llContainer.setOnClickListener(v -> showToast("线性布局容器点击"));
+        binding.btn1.setOnClickListener(v -> showToast("Button1"));
+        binding.btn2.setOnClickListener(v -> showToast("Button2"));
+        binding.btn3.setOnClickListener(v -> showToast("Button3"));
+        binding.btn4.setOnClickListener(v -> showToast("Button4"));
     }
 
 
@@ -54,7 +58,7 @@ public class MainActivity extends AppCompatActivity implements MainListener{
      * 1：只有一个参数，而且参数是 android.view.View类型
      * 2：无返回值
      */
-    @JokerDataTrackViewOnClick
+    @JokerTrackViewOnClick
     public void xmlClick(View v){
         showToast("xml绑定onClick");
     }
@@ -62,6 +66,11 @@ public class MainActivity extends AppCompatActivity implements MainListener{
     @Override
     public void onMainClick() {
         showToast("DataBinding点击事件");
+    }
+
+    @Override
+    public void onIncludeItemClick() {
+
     }
 
     private void showDialog(Context context) {

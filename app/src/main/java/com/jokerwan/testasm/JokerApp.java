@@ -5,7 +5,7 @@ import android.app.Application;
 import com.jokerwan.sdk.JokerDataAPI;
 
 /**
- * Created by JokerWan on 2019-12-05.p
+ * Created by JokerWan on 2019-12-05.
  * Function:
  */
 public class JokerApp extends Application {

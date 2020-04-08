@@ -5,6 +5,7 @@ import com.android.build.gradle.internal.pipeline.TransformManager
 import groovy.io.FileType
 import org.apache.commons.io.FileUtils
 import org.gradle.api.Project
+import org.apache.commons.codec.digest.DigestUtils
 
 class JokerAnalyticsTransform extends Transform {
     private static Project project

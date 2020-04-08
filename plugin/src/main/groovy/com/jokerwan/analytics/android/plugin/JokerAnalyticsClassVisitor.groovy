@@ -131,6 +131,12 @@ class JokerAnalyticsClassVisitor extends ClassVisitor implements Opcodes {
                     methodVisitor.visitMethodInsn(INVOKESTATIC, SDK_API_CLASS, "trackViewOnClick", "(Ljava/lang/Object;Landroid/view/MenuItem;)V", false)
                 }
 
+                if(nameDesc == 'onViewCreated(Landroid/view/View;Landroid/os/Bundle;)V'){
+                    methodVisitor.visitVarInsn(ALOAD, 0)
+                    methodVisitor.visitVarInsn(ALOAD, 1)
+                    methodVisitor.visitMethodInsn(INVOKESTATIC, SDK_API_CLASS, "onFragmentViewCreated", "(Ljava/lang/Object;Landroid/view/View;)V", false)
+                }
+
                 if (isTrackViewOnClickAnnotation) {
                     if (desc == '(Landroid/view/View;)V') {
                         methodVisitor.visitVarInsn(ALOAD, 1)

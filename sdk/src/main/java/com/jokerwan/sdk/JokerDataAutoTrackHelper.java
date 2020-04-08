@@ -5,6 +5,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,12 +17,17 @@ import android.widget.GridView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.ToggleButton;
 
 import androidx.annotation.Keep;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.SwitchCompat;
+
+import com.jokerwan.sdk.utils.AopUtil;
+import com.jokerwan.sdk.utils.ViewUtil;
+import com.jokerwan.sdk.utils.VisualUtil;
 
 import org.json.JSONObject;
 
@@ -391,23 +397,137 @@ public class JokerDataAutoTrackHelper {
     public static void trackViewOnClick(View view) {
         try {
             JSONObject jsonObject = new JSONObject();
-            jsonObject.put("$element_type", JokerDataPrivate.getElementType(view));
             jsonObject.put("$element_id", JokerDataPrivate.getViewId(view));
-            jsonObject.put("$element_content", JokerDataPrivate.getElementContent(view));
+
+            // ViewType ViewContent
+            ViewNode viewContentAndType = ViewUtil.getViewContentAndType(view);
+            if (!TextUtils.isEmpty(viewContentAndType.getViewType())) {
+                jsonObject.put("$element_type", viewContentAndType.getViewType());
+            }
+            if (!TextUtils.isEmpty(viewContentAndType.getViewContent()) && VisualUtil.isSupportElementContent(view)) {
+                jsonObject.put("$element_content", viewContentAndType.getViewContent());
+            }
+
+            // ViewPath  ViewPosition
+            ViewNode viewPathAndPosition = ViewUtil.getViewPathAndPosition(view);
+            if (viewPathAndPosition != null) {
+                String viewPath = viewPathAndPosition.getViewPath();
+                if (!TextUtils.isEmpty(viewPath)) {
+                    // 截取 View ID 为 content 的容器路径后的内容，也就是我们写在布局中的路径
+                    String contentContainerPath = "androidx.appcompat.widget.ContentFrameLayout[0]/";
+                    String substring = viewPath.substring(viewPath.indexOf(contentContainerPath) + contentContainerPath.length());
+                    jsonObject.put("$element_path", substring);
+                    Log.e("wjc", "trackViewOnClick: -->" + substring);
+                }
+                if (!TextUtils.isEmpty(viewPathAndPosition.getViewPosition())) {
+                    jsonObject.put("$element_position", viewPathAndPosition.getViewPosition());
+                }
+            }
+
 
             String tagData = JokerDataPrivate.getTagData(view);
-            if(!TextUtils.isEmpty(tagData)) {
+            if (!TextUtils.isEmpty(tagData)) {
                 jsonObject.put("$features", tagData);
             }
 
+            // ActivityName
             Activity activity = JokerDataPrivate.getActivityFromView(view);
             if (activity != null) {
                 jsonObject.put("$activity", activity.getClass().getCanonicalName());
+            }
+
+            // FragmentName
+            Object fragment = AopUtil.getFragmentFromView(view);
+            if (fragment != null) {
+                AopUtil.getScreenNameAndTitleFromFragment(jsonObject, fragment, activity);
             }
 
             JokerDataAPI.getInstance().track("$AppClick", jsonObject);
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public static void onFragmentViewCreated(Object object, View rootView) {
+        try {
+            if (!isFragment(object)) {
+                return;
+            }
+
+            //Fragment名称
+            String fragmentName = object.getClass().getName();
+            rootView.setTag(R.id.joker_tag_view_fragment_name, fragmentName);
+
+            if (rootView instanceof ViewGroup) {
+                traverseView(fragmentName, (ViewGroup) rootView);
+            }
+        } catch (Exception ignored) {
+        }
+    }
+
+    private static void traverseView(String fragmentName, ViewGroup root) {
+        try {
+            if (TextUtils.isEmpty(fragmentName)) {
+                return;
+            }
+
+            if (root == null) {
+                return;
+            }
+
+            final int childCount = root.getChildCount();
+            for (int i = 0; i < childCount; ++i) {
+                final View child = root.getChildAt(i);
+                child.setTag(R.id.joker_tag_view_fragment_name, fragmentName);
+                if (child instanceof ViewGroup && !(child instanceof ListView ||
+                        child instanceof GridView ||
+                        child instanceof Spinner ||
+                        child instanceof RadioGroup)) {
+                    traverseView(fragmentName, (ViewGroup) child);
+                }
+            }
+        } catch (Exception e) {
+            //ignored
+        }
+    }
+
+    private static boolean isFragment(Object object) {
+        try {
+            if (object == null) {
+                return false;
+            }
+            Class<?> supportFragmentClass = null;
+            Class<?> androidXFragmentClass = null;
+            Class<?> fragment = null;
+            try {
+                fragment = Class.forName("android.app.Fragment");
+            } catch (Exception e) {
+                //ignored
+            }
+            try {
+                supportFragmentClass = Class.forName("android.support.v4.app.Fragment");
+            } catch (Exception e) {
+                //ignored
+            }
+
+            try {
+                androidXFragmentClass = Class.forName("androidx.fragment.app.Fragment");
+            } catch (Exception e) {
+                //ignored
+            }
+
+            if (supportFragmentClass == null && androidXFragmentClass == null && fragment == null) {
+                return false;
+            }
+
+            if ((supportFragmentClass != null && supportFragmentClass.isInstance(object)) ||
+                    (androidXFragmentClass != null && androidXFragmentClass.isInstance(object)) ||
+                    (fragment != null && fragment.isInstance(object))) {
+                return true;
+            }
+        } catch (Exception e) {
+            //ignored
+        }
+        return false;
     }
 }

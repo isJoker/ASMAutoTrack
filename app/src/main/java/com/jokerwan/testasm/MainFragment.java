@@ -10,11 +10,16 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.fragment.app.Fragment;
 
+import com.jokerwan.sdk.ScreenAutoTracker;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 /**
  * Created by JokerWan on 2019-12-10.
  * Function:
  */
-public class MainFragment extends Fragment {
+public class MainFragment extends Fragment implements ScreenAutoTracker {
 
     @Nullable
     @Override
@@ -28,5 +33,20 @@ public class MainFragment extends Fragment {
             }
         });
         return view;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+    }
+
+    @Override
+    public String getScreenUrl() {
+        return "MainActivity/MainFragment";
+    }
+
+    @Override
+    public JSONObject getTrackProperties() throws JSONException {
+        return null;
     }
 }

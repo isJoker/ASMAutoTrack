@@ -1,4 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <item name="key_binding_tag" type="id"/>
+    <item name="joker_tag_view_value" type="id" />
+    <item name="joker_tag_view_id" type="id" />
+    <item name="joker_tag_view_ignored" type="id" />
+    <item name="joker_tag_view_properties" type="id" />
+    <item name="joker_tag_view_onclick_timestamp" type="id" />
+    <item name="joker_tag_view_fragment_name" type="id" />
+    <item name="joker_tag_view_fragment_name2" type="id" />
+    <item name="joker_tag_view_activity" type="id" />
 </resources>

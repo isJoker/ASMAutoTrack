@@ -14,82 +14,127 @@
             type="com.jokerwan.testasm.model.UserModel" />
     </data>
 
-    <LinearLayout
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center_horizontal"
-        android:orientation="vertical"
-        tools:context=".MainActivity">
-
-        <Button
-            android:id="@+id/btn_model"
-            BindingTag="@{model}"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="携带业务参数"
-            android:textAllCaps="false" />
-
-        <Button
-            android:id="@+id/btn_set_click"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="普通setClickListener"
-            android:textAllCaps="false" />
-
-        <Button
-            android:id="@+id/btn_xml_click"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:onClick="xmlClick"
-            android:text="xml绑定onClick"
-            android:textAllCaps="false" />
-
-        <Button
-            android:id="@+id/btn_data_binding_click"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:onClick="@{() -> listener.onMainClick()}"
-            android:text="DataBinding点击事件"
-            android:textAllCaps="false" />
-
-        <Button
-            android:id="@+id/btn_lambda_set_click"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Lambda 语法 setOnClickListener"
-            android:textAllCaps="false" />
-
-        <Button
-            android:id="@+id/btn_dialog_click"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="点击弹出Dialog"
-            android:textAllCaps="false" />
-
+        android:layout_height="match_parent">
         <LinearLayout
-            android:id="@+id/ll_container"
             android:layout_width="match_parent"
-            android:layout_height="100dp"
-            android:layout_marginTop="10dp"
-            android:background="#FFC107"
-            android:contentDescription="黄色区域线性布局容器"
-            android:gravity="center">
+            android:layout_height="match_parent"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            tools:context=".MainActivity">
 
-            <TextView
+            <Button
+                android:id="@+id/btn_model"
+                BindingTag="@{model}"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="线性布局容器点击"
-                android:textColor="@android:color/black"
-                android:textSize="18sp" />
+                android:text="携带业务参数"
+                android:textAllCaps="false" />
+
+            <Button
+                android:id="@+id/btn_set_click"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="普通setClickListener"
+                android:textAllCaps="false" />
+
+            <Button
+                android:id="@+id/btn_xml_click"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="xmlClick"
+                android:text="xml绑定onClick"
+                android:textAllCaps="false" />
+
+            <Button
+                android:id="@+id/btn_data_binding_click"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="@{() -> listener.onMainClick()}"
+                android:text="DataBinding点击事件"
+                android:textAllCaps="false" />
+
+            <Button
+                android:id="@+id/btn_lambda_set_click"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Lambda 语法 setOnClickListener"
+                android:textAllCaps="false" />
+
+            <Button
+                android:id="@+id/btn_dialog_click"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="点击弹出Dialog"
+                android:textAllCaps="false" />
+
+            <LinearLayout
+                android:id="@+id/ll_container"
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                android:layout_marginTop="10dp"
+                android:background="#FFC107"
+                android:contentDescription="黄色区域线性布局容器"
+                android:gravity="center">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="线性布局容器点击"
+                    android:textColor="@android:color/black"
+                    android:textSize="18sp" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                android:layout_marginTop="10dp"
+                android:background="#FFF8B8"
+                android:orientation="horizontal"
+                android:gravity="center">
+                <Button
+                    android:id="@+id/btn_1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="按钮1"
+                    android:textColor="@android:color/black"
+                    android:textSize="18sp" />
+                <Button
+                    android:id="@+id/btn_2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="按钮2"
+                    android:textColor="@android:color/black"
+                    android:textSize="18sp" />
+                <Button
+                    android:id="@+id/btn_3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="按钮3"
+                    android:textColor="@android:color/black"
+                    android:textSize="18sp" />
+                <Button
+                    android:id="@+id/btn_4"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="按钮4"
+                    android:textColor="@android:color/black"
+                    android:textSize="18sp" />
+            </LinearLayout>
+
+            <include layout="@layout/item_test"/>
+
+            <fragment
+                android:id="@+id/testFragment"
+                android:name="com.jokerwan.testasm.MainFragment"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:layout_marginTop="10dp" />
 
         </LinearLayout>
 
-        <fragment
-            android:id="@+id/testFragment"
-            android:name="com.jokerwan.testasm.MainFragment"
-            android:layout_width="match_parent"
-            android:layout_height="200dp"
-            android:layout_marginTop="30dp" />
+    </ScrollView>
 
-    </LinearLayout>
 </layout>
